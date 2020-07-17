@@ -13,13 +13,16 @@ import (
 )
 
 // SelectAction : Selects action given features and policy
-func SelectAction(contextPath string, policyPath string, actionTakenPath string) (int, float64) {
+func SelectAction(contextPath string, policyPath string, actionTakenPath string, verbose bool) (int, float64) {
 	fmt.Println("Selecting Action...")
 	cmdArgs := []string{
-		"-t",
+		// "-t", // testing removed (I don't think its needed?)
 		"-d", contextPath,
 		"-i", policyPath,
 		"-p", actionTakenPath,
+	}
+	if !verbose {
+		cmdArgs = append(cmdArgs, "--quiet")
 	}
 	cmd := exec.Command("vw", cmdArgs...)
 	out, err := cmd.CombinedOutput()

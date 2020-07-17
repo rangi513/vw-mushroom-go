@@ -1,4 +1,6 @@
-actionTaken.dat
-context.dat
-scored.dat
-mushroom_policy.vw
+data/actionTaken.dat
+data/context.dat
+data/scored.dat
+data/mushroom_policy.vw
+data/mushroom_policy.txt
+data/log.dat

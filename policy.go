@@ -4,25 +4,31 @@ import (
 	"fmt"
 	"log"
 	"os/exec"
+	"strings"
 )
 
 // UpdatePolicy : Creates a new policy or updates an existing policy based on observed data
 func UpdatePolicy(observedDataPath string, policyPath string, banditMethod string,
 	totalActions string, policyEvaluationApproach string, explorationAlgorithm string,
-	explorationParam string) {
+	explorationParam string, verbose bool) {
 
 	cmdArgs := []string{
-		"-d", observedDataPath,
 		banditMethod, totalActions,
 		"--cb_type", policyEvaluationApproach,
 		explorationAlgorithm, explorationParam,
 		"-f", policyPath,
+		"--invert_hash", strings.TrimRight(policyPath, ".vw") + ".txt",
 	}
 	if fileExists(policyPath) {
+		// If policy exists, update existing policy
 		fmt.Println("Updating policy...")
-		cmdArgs = append(cmdArgs, "-i", policyPath)
+		cmdArgs = append(cmdArgs, "-d", observedDataPath, "-i", policyPath)
 	} else {
+		// If policy does not exist, create a new one
 		fmt.Println("Creating initial policy...")
+	}
+	if !verbose {
+		cmdArgs = append(cmdArgs, "--quiet")
 	}
 	cmd := exec.Command("vw", cmdArgs...)
 	out, err := cmd.CombinedOutput()
@@ -30,23 +36,4 @@ func UpdatePolicy(observedDataPath string, policyPath string, banditMethod strin
 		log.Fatal(err)
 	}
 	fmt.Println("Finished Policy Update: \n", string(out))
-}
-
-// CreatePolicy : Creates initial policy with no data (cold start)
-func CreatePolicy(initialPolicyPath string, banditMethod string,
-	totalActions string, policyEvaluationApproach string, explorationAlgorithm string,
-	explorationParam string) {
-	fmt.Println("Creating Initial Policy")
-	cmdArgs := []string{
-		banditMethod, totalActions,
-		"--cb_type", policyEvaluationApproach,
-		explorationAlgorithm, explorationParam,
-		"-f", initialPolicyPath,
-	}
-	cmd := exec.Command("vw", cmdArgs...)
-	out, err := cmd.CombinedOutput()
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Println("Finished Creating Initial Policy: \n", string(out))
 }
