@@ -32,7 +32,7 @@ func SelectAction(contextPath string, policyPath string, actionTakenPath string)
 	// 2. Sample From PMF
 	actionIndex, probability := sampleCustomPMF(actionProbs)
 	// 3. Return Action and Probability
-	return actionIndex, probability
+	return actionIndex + 1, probability
 }
 
 func getActionProbs(actionTakenPath string) []float64 {
