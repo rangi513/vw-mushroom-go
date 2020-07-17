@@ -9,17 +9,20 @@ import (
 func main() {
 	// Set Constants and seed
 	rand.Seed(time.Now().Unix())
-	const iter = 10
+	const iter = 1000
+	// Files
 	const scoredRecordPath = "data/scored.dat"
 	const contextPath = "data/context.dat"
 	const actionTakenPath = "data/actionTaken.dat"
 	const policyPath = "data/mushroom_policy.vw"
 	const logPath = "data/log.dat"
+	// Learning Params
 	const banditMethod = "--cb_explore"
 	const totalActions = "2"
 	const policyEvaluationApproach = "dr"
 	const explorationAlgorithm = "--cover"
 	const explorationParam = "3"
+	// Config
 	const verbose = false
 
 	// Initialize Policy

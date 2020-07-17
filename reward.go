@@ -3,18 +3,24 @@ package main
 import (
 	"fmt"
 	"log"
+	"math/rand"
 	"os"
 )
 
-// GetReward : cost 20 if poisonous, cost -1 if edible, 0 if do nothing
+// GetReward : reward +5 for edible and +5, -35 with equal probability for poisonous.
+// 0 reward if you don't eat
 func GetReward(action int, class string) float64 {
 	var reward float64
 	if action == 2 && class == "e" {
-		reward = 1
+		reward = 5
 	} else if action == 2 && class == "p" {
-		reward = -5
+		if rand.Float64() >= 0.5 {
+			reward = -35
+		} else {
+			reward = 5
+		}
 	} else if action == 1 {
-		reward = -1
+		reward = 0.0
 	} else {
 		log.Fatal("Invalid action provided.")
 		fmt.Println("Action: ", action)
