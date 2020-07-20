@@ -9,7 +9,7 @@ import (
 func main() {
 	// Set Constants and seed
 	rand.Seed(time.Now().Unix())
-	const iter = 1000
+	const iter = 5000
 	// Files
 	const scoredRecordPath = "data/scored.dat"
 	const contextPath = "data/context.dat"
@@ -21,7 +21,7 @@ func main() {
 	const totalActions = "2"
 	const policyEvaluationApproach = "dr"
 	const explorationAlgorithm = "--cover"
-	const explorationParam = "3"
+	const explorationParam = "8"
 	// Config
 	const verbose = false
 
@@ -30,7 +30,9 @@ func main() {
 	// Pull Data
 	mushrooms := getMushrooms()
 	for i := 0; i <= iter-1; i++ {
-		fmt.Println("Iteration: ", i)
+		if i%500 == 0 {
+			fmt.Println("Iteration: ", i)
+		}
 		randomMushroom := sampleMushroom(mushrooms)
 		featureSet := mushroomToString(randomMushroom)
 		WriteToFile(contextPath, featureSet)

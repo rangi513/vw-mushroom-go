@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 	"os/exec"
-	"strings"
 )
 
 // UpdatePolicy : Creates a new policy or updates an existing policy based on observed data
@@ -16,16 +15,21 @@ func UpdatePolicy(observedDataPath string, policyPath string, banditMethod strin
 		banditMethod, totalActions,
 		"--cb_type", policyEvaluationApproach,
 		explorationAlgorithm, explorationParam,
+		//"--interactions", "aa",
 		"-f", policyPath,
-		"--invert_hash", strings.TrimRight(policyPath, ".vw") + ".txt",
+		// "--invert_hash", strings.TrimRight(policyPath, ".vw") + ".txt",
 	}
 	if fileExists(policyPath) {
 		// If policy exists, update existing policy
-		fmt.Println("Updating policy...")
+		if verbose {
+			fmt.Println("Updating policy...")
+		}
 		cmdArgs = append(cmdArgs, "-d", observedDataPath, "-i", policyPath)
 	} else {
 		// If policy does not exist, create a new one
-		fmt.Println("Creating initial policy...")
+		if verbose {
+			fmt.Println("Creating initial policy...")
+		}
 	}
 	if !verbose {
 		cmdArgs = append(cmdArgs, "--quiet")
@@ -35,5 +39,7 @@ func UpdatePolicy(observedDataPath string, policyPath string, banditMethod strin
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println("Finished Policy Update: \n", string(out))
+	if verbose {
+		fmt.Println("Finished Policy Update: \n", string(out))
+	}
 }

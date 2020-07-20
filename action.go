@@ -14,7 +14,9 @@ import (
 
 // SelectAction : Selects action given features and policy
 func SelectAction(contextPath string, policyPath string, actionTakenPath string, verbose bool) (int, float64) {
-	fmt.Println("Selecting Action...")
+	if verbose {
+		fmt.Println("Selecting Action...")
+	}
 	cmdArgs := []string{
 		// "-t", // testing removed (I don't think its needed?)
 		"-d", contextPath,
@@ -29,7 +31,9 @@ func SelectAction(contextPath string, policyPath string, actionTakenPath string,
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println("Action Selected: \n", string(out))
+	if verbose {
+		fmt.Println("Action Selected: \n", string(out))
+	}
 	// 1. Read Action probabilities into slice
 	actionProbs := getActionProbs(actionTakenPath)
 	// 2. Sample From PMF
@@ -82,5 +86,5 @@ func sampleCustomPMF(actionProbs []float64) (int, float64) {
 			return index, prob
 		}
 	}
-	return len(scaledActionProbs), 1.0
+	return len(scaledActionProbs) - 1, 1.0
 }
