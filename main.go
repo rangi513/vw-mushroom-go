@@ -25,14 +25,16 @@ func main() {
 	// Config
 	const verbose = false
 
-	// Initialize Policy
-	UpdatePolicy(scoredRecordPath, policyPath, banditMethod, totalActions, policyEvaluationApproach, explorationAlgorithm, explorationParam, verbose)
 	// Pull Data
 	mushrooms := getMushrooms()
 	for i := 0; i <= iter-1; i++ {
 		if i%500 == 0 {
 			fmt.Println("Iteration: ", i)
 		}
+		// Initialize or Update Policy
+		UpdatePolicy(scoredRecordPath, policyPath, banditMethod, totalActions, policyEvaluationApproach, explorationAlgorithm, explorationParam, false, verbose)
+
+		// Sample with replacement from data
 		randomMushroom := sampleMushroom(mushrooms)
 		featureSet := mushroomToString(randomMushroom)
 		WriteToFile(contextPath, featureSet)
@@ -46,7 +48,8 @@ func main() {
 			cost = reward * -1.0
 		}
 		WriteScored(action, cost, probability, featureSet, scoredRecordPath, logPath)
-		// Update Policy
-		UpdatePolicy(scoredRecordPath, policyPath, banditMethod, totalActions, policyEvaluationApproach, explorationAlgorithm, explorationParam, verbose)
 	}
+
+	// Final Update with coefficient output
+	UpdatePolicy(scoredRecordPath, policyPath, banditMethod, totalActions, policyEvaluationApproach, explorationAlgorithm, explorationParam, true, verbose)
 }
