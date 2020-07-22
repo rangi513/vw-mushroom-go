@@ -18,6 +18,8 @@ func CollectData(d string) (Data, string) {
 		return GetMushrooms(), GetMushroomActions()
 	case "shuttle":
 		return GetShuttle(), GetShuttleActions()
+	case "ball":
+		return GetBalls(), GetBallActions()
 	}
 	return nil, "0"
 }
