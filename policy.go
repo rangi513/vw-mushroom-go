@@ -19,7 +19,7 @@ func UpdatePolicy(observedDataPath string, policyPath string, banditMethod strin
 		//"--interactions", "aa",
 		"-f", policyPath,
 	}
-	if fileExists(policyPath) {
+	if FileExists(policyPath) {
 		// If policy exists, update existing policy
 		if verbose {
 			fmt.Println("Updating policy...")

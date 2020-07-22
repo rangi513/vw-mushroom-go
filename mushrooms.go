@@ -11,6 +11,7 @@ import (
 	"strings"
 )
 
+// Mushroom : struct defining how to parse the mushroom csv. All strings with the class first.
 type Mushroom struct {
 	Class                 string
 	CapShape              string
@@ -37,12 +38,15 @@ type Mushroom struct {
 	Habitat               string
 }
 
+// Mushrooms : slice of Mushroom
 type Mushrooms []Mushroom
 
+// Sample : take a single random sample from a Mushroom record
 func (m Mushrooms) Sample() Record {
 	return m[rand.Intn(len(m))]
 }
 
+// Features : Extract features from Mushroom struct into VW string input
 func (m Mushroom) Features() string {
 	s := fmt.Sprintf("%+v", m)
 	s = strings.TrimSuffix(s, "}")
@@ -75,6 +79,12 @@ func (m Mushroom) Reward(action int) (float64, error) {
 	return reward, nil
 }
 
+// GetMushroomActions : Get the total number of actions for the Mushroom Dataset
+func GetMushroomActions() string {
+	return "2"
+}
+
+// GetMushrooms : Parses the provided full csv into a Mushrooms struct
 func GetMushrooms() Mushrooms {
 	// Open the file
 	csvFile, err := os.Open("data/agaricus-lepiota.csv")

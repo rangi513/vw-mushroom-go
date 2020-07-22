@@ -5,8 +5,8 @@ import (
 	"os"
 )
 
-// fileExists : checks if a file exists
-func fileExists(filename string) bool {
+// FileExists : checks if a file exists
+func FileExists(filename string) bool {
 	info, err := os.Stat(filename)
 	if os.IsNotExist(err) {
 		return false
@@ -30,6 +30,7 @@ func WriteToFile(filename string, data string) error {
 	return file.Sync()
 }
 
+// TrimLeftChar : Trims the left character from a string
 func TrimLeftChar(s string) string {
 	for i := range s {
 		if i > 0 {

@@ -10,10 +10,9 @@ import (
 func main() {
 	// Set Constants and seed
 	rand.Seed(time.Now().Unix())
-	const iter = 5000
+	const iter = 25000
 	// Dataset "mushroom" or "shuttle"
 	const datasetName = "shuttle"
-	const totalActions = "7"
 	// Files
 	const scoredRecordPath = "updates/scored.dat"
 	const contextPath = "updates/context.dat"
@@ -24,12 +23,12 @@ func main() {
 	const banditMethod = "--cb_explore"
 	const policyEvaluationApproach = "dr"
 	const explorationAlgorithm = "--cover"
-	const explorationParam = "4"
+	const explorationParam = "8"
 	// Config
 	const verbose = false
 
 	// Pull Data
-	records := CollectData(datasetName)
+	records, totalActions := CollectData(datasetName)
 	for i := 0; i <= iter-1; i++ {
 		if i%500 == 0 {
 			fmt.Println("Iteration: ", i)

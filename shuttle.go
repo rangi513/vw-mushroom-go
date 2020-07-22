@@ -13,7 +13,7 @@ import (
 	"strings"
 )
 
-// Shuttle :
+// Shuttle : struct defining how to parse the shuttle csv. All int with the class last.
 type Shuttle struct {
 	a     int
 	b     int
@@ -30,12 +30,12 @@ type Shuttle struct {
 // Shuttles : slice of Shutle
 type Shuttles []Shuttle
 
-// Sample :
+// Sample : take a single random sample from a Shuttle record
 func (s Shuttles) Sample() Record {
 	return s[rand.Intn(len(s))]
 }
 
-// Features :
+// Features : Extract features from Shuttle struct into VW string input
 func (s Shuttle) Features() string {
 	st := fmt.Sprintf("%+v", s)
 	st = strings.TrimPrefix(st, "{")
@@ -56,7 +56,12 @@ func (s Shuttle) Reward(action int) (float64, error) {
 	return r, nil
 }
 
-// GetShuttle :
+//GetShuttleActions : Get total number of actions for the Shuttle dataset
+func GetShuttleActions() string {
+	return "7"
+}
+
+// GetShuttle : Parses the provided full csv into a Shuttles struct
 func GetShuttle() Shuttles {
 	// Open the file
 	csvFile, err := os.Open("data/shuttle.csv")
