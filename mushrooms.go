@@ -47,7 +47,7 @@ func (m Mushroom) Features() string {
 	s := fmt.Sprintf("%+v", m)
 	s = strings.TrimSuffix(s, "}")
 	s = strings.TrimPrefix(s, "{Class:")
-	s = trimLeftChar(s)
+	s = TrimLeftChar(s)
 	s = strings.TrimSpace(s)
 	s = strings.ReplaceAll(s, ":", "=")
 	s = "| " + s
@@ -119,13 +119,4 @@ func GetMushrooms() Mushrooms {
 		})
 	}
 	return ms
-}
-
-func trimLeftChar(s string) string {
-	for i := range s {
-		if i > 0 {
-			return s[i:]
-		}
-	}
-	return s[:0]
 }

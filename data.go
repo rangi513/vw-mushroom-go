@@ -14,8 +14,8 @@ func CollectData(d string) Data {
 	switch d {
 	case "mushroom":
 		return GetMushrooms()
-		// case "shuttle":
-		// return GetShuttle()
+	case "shuttle":
+		return GetShuttle()
 	}
 	return nil
 }

@@ -12,7 +12,7 @@ func main() {
 	rand.Seed(time.Now().Unix())
 	const iter = 5000
 	// Dataset "mushroom" or "shuttle"
-	const datasetName = "mushroom"
+	const datasetName = "shuttle"
 	// Files
 	const scoredRecordPath = "updates/scored.dat"
 	const contextPath = "updates/context.dat"
@@ -29,7 +29,7 @@ func main() {
 	const verbose = false
 
 	// Pull Data
-	mushrooms := CollectData(datasetName)
+	records := CollectData(datasetName)
 	for i := 0; i <= iter-1; i++ {
 		if i%500 == 0 {
 			fmt.Println("Iteration: ", i)
@@ -38,16 +38,16 @@ func main() {
 		UpdatePolicy(scoredRecordPath, policyPath, banditMethod, totalActions, policyEvaluationApproach, explorationAlgorithm, explorationParam, false, verbose)
 
 		// Sample with replacement from data
-		randomMushroom := mushrooms.Sample()
-		featureSet := randomMushroom.Features()
+		record := records.Sample()
+		featureSet := record.Features()
 		WriteToFile(contextPath, featureSet)
 
 		// Take Action
 		action, probability := SelectAction(contextPath, policyPath, actionTakenPath, verbose)
 		// Observe Reward
-		reward, err := randomMushroom.Reward(action)
+		reward, err := record.Reward(action)
 		if err != nil {
-			log.Fatalf("No reward returned ", err)
+			log.Fatal("No reward returned ", err)
 		}
 		cost := 0.0
 		if reward != 0.0 {
