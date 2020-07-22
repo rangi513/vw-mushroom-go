@@ -39,11 +39,21 @@ func (s Shuttles) Sample() Record {
 func (s Shuttle) Features() string {
 	st := fmt.Sprintf("%+v", s)
 	st = strings.TrimPrefix(st, "{")
-	reg := regexp.MustCompile(`.+?(?=Class)`)
+	reg := regexp.MustCompile(`Class.*$`)
 	st = reg.ReplaceAllString(st, "${1}")
 	st = strings.TrimSpace(st)
 	st = "| " + st
 	return st
+}
+
+// Reward : . There are k = 7 possible states, and if the agent selects the right
+// state, then reward 1 is generated. Otherwise, the agent obtains no reward (r = 0).
+func (s Shuttle) Reward(action int) (float64, error) {
+	r := 0.0
+	if action == s.Class {
+		r = 1.0
+	}
+	return r, nil
 }
 
 // GetShuttle :
@@ -65,12 +75,12 @@ func GetShuttle() Shuttles {
 			log.Fatal(err)
 		}
 		xi := make([]int, 10)
-		for _, v := range line {
+		for i, v := range line {
 			vi, err := strconv.Atoi(v)
 			if err != nil {
 				log.Fatal("Cannot convert str to int in csv parsing.", err)
 			}
-			xi = append(xi, vi)
+			xi[i] = vi
 		}
 		ss = append(ss, Shuttle{
 			a:     xi[0],
@@ -86,14 +96,4 @@ func GetShuttle() Shuttles {
 		})
 	}
 	return ss
-}
-
-// Reward : . There are k = 7 possible states, and if the agent selects the right
-// state, then reward 1 is generated. Otherwise, the agent obtains no reward (r = 0).
-func (s Shuttle) Reward(action int) (float64, error) {
-	r := 0.0
-	if action == s.Class {
-		r = 1.0
-	}
-	return r, nil
 }

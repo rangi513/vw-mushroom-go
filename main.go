@@ -13,6 +13,7 @@ func main() {
 	const iter = 5000
 	// Dataset "mushroom" or "shuttle"
 	const datasetName = "shuttle"
+	const totalActions = "7"
 	// Files
 	const scoredRecordPath = "updates/scored.dat"
 	const contextPath = "updates/context.dat"
@@ -21,10 +22,9 @@ func main() {
 	const logPath = "updates/log.dat"
 	// Learning Params
 	const banditMethod = "--cb_explore"
-	const totalActions = "2"
 	const policyEvaluationApproach = "dr"
 	const explorationAlgorithm = "--cover"
-	const explorationParam = "3"
+	const explorationParam = "4"
 	// Config
 	const verbose = false
 
