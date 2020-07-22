@@ -42,7 +42,7 @@ func (s Shuttle) Features() string {
 	reg := regexp.MustCompile(`Class.*$`)
 	st = reg.ReplaceAllString(st, "${1}")
 	st = strings.TrimSpace(st)
-	st = "| " + st
+	st = "|A " + st
 	return st
 }
 

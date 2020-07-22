@@ -10,9 +10,9 @@ import (
 func main() {
 	// Set Constants and seed
 	rand.Seed(time.Now().Unix())
-	const iter = 5000
+	const iter = 150000
 	// Dataset "mushroom" or "shuttle" or "ball"
-	const datasetName = "ball"
+	const datasetName = "shuttle"
 	// Files
 	const scoredRecordPath = "updates/scored.dat"
 	const contextPath = "updates/context.dat"
@@ -23,7 +23,7 @@ func main() {
 	const banditMethod = "--cb_explore"
 	const policyEvaluationApproach = "dr"
 	const explorationAlgorithm = "--cover"
-	const explorationParam = "4"
+	const explorationParam = "32"
 	// Config
 	const verbose = false
 

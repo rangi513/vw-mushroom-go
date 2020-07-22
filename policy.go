@@ -16,7 +16,7 @@ func UpdatePolicy(observedDataPath string, policyPath string, banditMethod strin
 		banditMethod, totalActions,
 		"--cb_type", policyEvaluationApproach,
 		explorationAlgorithm, explorationParam,
-		//"--interactions", "aa",
+		"--interactions", "AA",
 		"-f", policyPath,
 	}
 	if FileExists(policyPath) {
