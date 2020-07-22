@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"math/rand"
 	"time"
 )
@@ -10,23 +11,25 @@ func main() {
 	// Set Constants and seed
 	rand.Seed(time.Now().Unix())
 	const iter = 5000
+	// Dataset "mushroom" or "shuttle"
+	const datasetName = "mushroom"
 	// Files
-	const scoredRecordPath = "data/scored.dat"
-	const contextPath = "data/context.dat"
-	const actionTakenPath = "data/actionTaken.dat"
-	const policyPath = "data/mushroom_policy.vw"
-	const logPath = "data/log.dat"
+	const scoredRecordPath = "updates/scored.dat"
+	const contextPath = "updates/context.dat"
+	const actionTakenPath = "updates/actionTaken.dat"
+	const policyPath = "updates/policy.vw"
+	const logPath = "updates/log.dat"
 	// Learning Params
 	const banditMethod = "--cb_explore"
 	const totalActions = "2"
 	const policyEvaluationApproach = "dr"
 	const explorationAlgorithm = "--cover"
-	const explorationParam = "8"
+	const explorationParam = "3"
 	// Config
 	const verbose = false
 
 	// Pull Data
-	mushrooms := getMushrooms()
+	mushrooms := CollectData(datasetName)
 	for i := 0; i <= iter-1; i++ {
 		if i%500 == 0 {
 			fmt.Println("Iteration: ", i)
@@ -35,14 +38,17 @@ func main() {
 		UpdatePolicy(scoredRecordPath, policyPath, banditMethod, totalActions, policyEvaluationApproach, explorationAlgorithm, explorationParam, false, verbose)
 
 		// Sample with replacement from data
-		randomMushroom := sampleMushroom(mushrooms)
-		featureSet := mushroomToString(randomMushroom)
+		randomMushroom := mushrooms.Sample()
+		featureSet := randomMushroom.Features()
 		WriteToFile(contextPath, featureSet)
 
 		// Take Action
 		action, probability := SelectAction(contextPath, policyPath, actionTakenPath, verbose)
 		// Observe Reward
-		reward := GetReward(action, randomMushroom.Class)
+		reward, err := randomMushroom.Reward(action)
+		if err != nil {
+			log.Fatalf("No reward returned ", err)
+		}
 		cost := 0.0
 		if reward != 0.0 {
 			cost = reward * -1.0

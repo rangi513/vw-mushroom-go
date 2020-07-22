@@ -11,7 +11,7 @@ import (
 	"strings"
 )
 
-type mushroom struct {
+type Mushroom struct {
 	Class                 string
 	CapShape              string
 	CapSurface            string
@@ -37,24 +37,62 @@ type mushroom struct {
 	Habitat               string
 }
 
-func getMushrooms() []mushroom {
+type Mushrooms []Mushroom
+
+func (m Mushrooms) Sample() Record {
+	return m[rand.Intn(len(m))]
+}
+
+func (m Mushroom) Features() string {
+	s := fmt.Sprintf("%+v", m)
+	s = strings.TrimSuffix(s, "}")
+	s = strings.TrimPrefix(s, "{Class:")
+	s = trimLeftChar(s)
+	s = strings.TrimSpace(s)
+	s = strings.ReplaceAll(s, ":", "=")
+	s = "| " + s
+	return s
+}
+
+// Reward : reward +5 for edible and +5, -35 with equal probability for poisonous.
+// 0 reward if you don't eat
+func (m Mushroom) Reward(action int) (float64, error) {
+	class := m.Class
+	reward := 0.0
+	if action == 2 && class == "e" {
+		reward = 5
+	} else if action == 2 && class == "p" {
+		if rand.Float64() >= 0.5 {
+			reward = -35
+		} else {
+			reward = 5
+		}
+	} else if action == 1 {
+		reward = 0.0
+	} else {
+		return 0, fmt.Errorf("Invalid action provided")
+	}
+	return reward, nil
+}
+
+func GetMushrooms() Mushrooms {
 	// Open the file
-	csvFile, err := os.Open("agaricus-lepiota.csv")
+	csvFile, err := os.Open("data/agaricus-lepiota.csv")
 	if err != nil {
 		log.Fatalln("Couldn't open the csv file", err)
 	}
 	// Parse the file
 	r := csv.NewReader(bufio.NewReader(csvFile))
 	// Iterate through the records
-	var mushrooms []mushroom
+	var ms []Mushroom
 	for {
-		line, error := r.Read()
-		if error == io.EOF {
+		line, err := r.Read()
+		if err == io.EOF {
 			break
-		} else if error != nil {
-			log.Fatal(error)
+		} else if err != nil {
+			log.Fatal(err)
 		}
-		mushrooms = append(mushrooms, mushroom{
+		ms = append(ms, Mushroom{
 			Class:                 line[0],
 			CapShape:              line[1],
 			CapSurface:            line[2],
@@ -80,22 +118,7 @@ func getMushrooms() []mushroom {
 			Habitat:               line[22],
 		})
 	}
-	return mushrooms
-}
-
-func sampleMushroom(mushrooms []mushroom) mushroom {
-	return mushrooms[rand.Intn(len(mushrooms))]
-}
-
-func mushroomToString(m mushroom) string {
-	s := fmt.Sprintf("%+v", m)
-	s = strings.TrimSuffix(s, "}")
-	s = strings.TrimPrefix(s, "{Class:")
-	s = trimLeftChar(s)
-	s = strings.TrimSpace(s)
-	s = strings.ReplaceAll(s, ":", "=")
-	s = "| " + s
-	return s
+	return ms
 }
 
 func trimLeftChar(s string) string {

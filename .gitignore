@@ -1,7 +1,7 @@
-data/actionTaken.dat
-data/context.dat
-data/scored.dat
-data/mushroom_policy.vw
-data/mushroom_policy.txt
-data/log.dat
+updates/actionTaken.dat
+updates/context.dat
+updates/scored.dat
+updates/policy.vw
+updates/policy.txt
+updates/log.dat
 viz.R
