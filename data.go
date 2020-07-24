@@ -8,7 +8,7 @@ type Data interface {
 // Record : Interface for methods Features() and Reward(). A single row of data.
 type Record interface {
 	Features() string
-	Reward(action int) (float64, error)
+	Reward(action int) float64
 }
 
 // CollectData : collects the dataset from the respective source and the number of total actions

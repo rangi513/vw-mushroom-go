@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"math/rand"
 	"time"
 )
@@ -43,11 +42,9 @@ func main() {
 
 		// Take Action
 		action, probability := SelectAction(featureSet, np, verbose)
+
 		// Observe Reward
-		reward, err := record.Reward(action)
-		if err != nil {
-			log.Fatal("No reward returned ", err)
-		}
+		reward := record.Reward(action)
 		cost := Cost(reward)
 
 		scoredAction = ScoredString(action, cost, probability, featureSet)

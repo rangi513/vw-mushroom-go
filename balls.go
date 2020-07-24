@@ -46,7 +46,7 @@ func (b Ball) Features() string {
 
 // Reward : There are k = 2 possible states, and if the agent selects the right
 // state, then reward 1 is generated. Otherwise, the agent obtains no reward (r = 0).
-func (b Ball) Reward(action int) (float64, error) {
+func (b Ball) Reward(action int) float64 {
 	r := 0.0
 	if action == 1 && b.Class == "a" {
 		r = 1.0
@@ -67,7 +67,7 @@ func (b Ball) Reward(action int) (float64, error) {
 	} else if action == 9 && b.Class == "i" {
 		r = 1.0
 	}
-	return r, nil
+	return r
 }
 
 // GetBallActions : Get the total number of actions for the Mushroom Dataset

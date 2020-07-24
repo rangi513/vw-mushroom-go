@@ -60,7 +60,7 @@ func (m Mushroom) Features() string {
 
 // Reward : reward +5 for edible and +5, -35 with equal probability for poisonous.
 // 0 reward if you don't eat
-func (m Mushroom) Reward(action int) (float64, error) {
+func (m Mushroom) Reward(action int) float64 {
 	class := m.Class
 	reward := 0.0
 	if action == 2 && class == "e" {
@@ -74,9 +74,9 @@ func (m Mushroom) Reward(action int) (float64, error) {
 	} else if action == 1 {
 		reward = 0.0
 	} else {
-		return 0, fmt.Errorf("Invalid action provided")
+		log.Fatal("Error: Invalid Action selected")
 	}
-	return reward, nil
+	return reward
 }
 
 // GetMushroomActions : Get the total number of actions for the Mushroom Dataset
