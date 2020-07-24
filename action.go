@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"math/rand"
 	"os/exec"
@@ -13,43 +13,51 @@ import (
 )
 
 // SelectAction : Selects action given features and policy
-func SelectAction(contextPath string, policyPath string, actionTakenPath string, verbose bool) (int, float64) {
+func SelectAction(context string, policyPath string, verbose bool) (int, float64) {
 	if verbose {
 		fmt.Println("Selecting Action...")
 	}
+	// Collect Arguments
 	cmdArgs := []string{
-		// "-t", // testing removed (I don't think its needed?)
-		"-d", contextPath,
+		"-t", // testing only saves memory
 		"-i", policyPath,
-		"-p", actionTakenPath,
+		"-p", "/dev/stdout", // Pipe predictions to stdout instead of file
 	}
 	if !verbose {
 		cmdArgs = append(cmdArgs, "--quiet")
 	}
+	// Initialize Command
 	cmd := exec.Command("vw", cmdArgs...)
-	out, err := cmd.CombinedOutput()
+	// Pipe context to stdin
+	stdin, err := cmd.StdinPipe()
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("Could not pipe context into stdin ", err)
+	}
+	go func() {
+		defer stdin.Close()
+		io.WriteString(stdin, context)
+	}()
+
+	// Execute Command
+	stdout, err := cmd.CombinedOutput()
+	if err != nil {
+		log.Fatal("Couldn't select action ", err)
 	}
 	if verbose {
-		fmt.Println("Action Selected: \n", string(out))
+		fmt.Println("Action Selected: \n", string(stdout))
 	}
 	// 1. Read Action probabilities into slice
-	actionProbs := getActionProbs(actionTakenPath)
+	actionProbs := getActionProbs(stdout)
 	// 2. Sample From PMF
 	actionIndex, probability := sampleCustomPMF(actionProbs)
 	// 3. Return Action and Probability
 	return actionIndex + 1, probability
 }
 
-func getActionProbs(actionTakenPath string) []float64 {
+func getActionProbs(actionTaken []byte) []float64 {
 	var actionProbsFloat []float64
 
-	s, err := ioutil.ReadFile(actionTakenPath)
-	if err != nil {
-		fmt.Print(err)
-	}
-	actionProbs := strings.Fields(string(s))
+	actionProbs := strings.Fields(string(actionTaken))
 
 	for _, prob := range actionProbs {
 		if n, err := strconv.ParseFloat(prob, 64); err == nil {

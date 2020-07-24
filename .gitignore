@@ -1,8 +1,3 @@
-updates/actionTaken.dat
-updates/context.dat
-updates/scored.dat
-updates/policy.vw
-updates/policy.txt
-updates/log.dat
+updates/**
 viz.R
 shuttle_classifiers.R

@@ -102,3 +102,17 @@ func GetShuttle() Shuttles {
 	}
 	return ss
 }
+
+// CreateOfflineShuttleDataset : Creates a VW formatted offline dataset for training a classifier
+func CreateOfflineShuttleDataset() {
+	s := GetShuttle()
+	v := Shuttle{}
+	f := ""
+	scored := ""
+	for i := 0; i < len(s); i++ {
+		v = s[i]
+		f = v.Features()
+		scored = strconv.Itoa(v.Class) + " " + strconv.Itoa(v.Class) + f + "\n"
+		AppendToLog("data/shuttle_dataset.dat", scored)
+	}
+}

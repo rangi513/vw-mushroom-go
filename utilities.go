@@ -3,6 +3,7 @@ package main
 import (
 	"io"
 	"os"
+	"strconv"
 )
 
 // FileExists : checks if a file exists
@@ -38,4 +39,11 @@ func TrimLeftChar(s string) string {
 		}
 	}
 	return s[:0]
+}
+
+// GetPolicyPaths : Returns the old and new policy paths based on the current iteration
+func GetPolicyPaths(policyPathBase string, iter int) (string, string) {
+	op := policyPathBase + strconv.Itoa(iter) + ".vw"
+	np := policyPathBase + strconv.Itoa(iter+1) + ".vw"
+	return op, np
 }

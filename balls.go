@@ -9,13 +9,19 @@ import (
 	"math/rand"
 	"os"
 	"regexp"
+	"strconv"
 	"strings"
 )
 
 // Ball : struct defining how to parse the balls csv. All strings with the class last.
 type Ball struct {
-	Color string
-	Class string
+	red    int
+	green  int
+	blue   int
+	yellow int
+	white  int
+	black  int
+	Class  string
 }
 
 // Balls : slice of Ball
@@ -33,7 +39,7 @@ func (b Ball) Features() string {
 	reg := regexp.MustCompile(`Class.*$`)
 	st = reg.ReplaceAllString(st, "${1}")
 	st = strings.TrimSpace(st)
-	st = strings.ReplaceAll(st, ":", "=")
+	// st = strings.ReplaceAll(st, ":", "=")
 	st = "| " + st
 	return st
 }
@@ -46,13 +52,27 @@ func (b Ball) Reward(action int) (float64, error) {
 		r = 1.0
 	} else if action == 2 && b.Class == "b" {
 		r = 1.0
+	} else if action == 3 && b.Class == "c" {
+		r = 1.0
+	} else if action == 4 && b.Class == "d" {
+		r = 1.0
+	} else if action == 5 && b.Class == "e" {
+		r = 1.0
+	} else if action == 6 && b.Class == "f" {
+		r = 1.0
+	} else if action == 7 && b.Class == "g" {
+		r = 1.0
+	} else if action == 8 && b.Class == "h" {
+		r = 1.0
+	} else if action == 9 && b.Class == "i" {
+		r = 1.0
 	}
 	return r, nil
 }
 
 // GetBallActions : Get the total number of actions for the Mushroom Dataset
 func GetBallActions() string {
-	return "2"
+	return "6"
 }
 
 // GetBalls : Parses the provided full csv into a Balls struct
@@ -73,9 +93,25 @@ func GetBalls() Balls {
 		} else if err != nil {
 			log.Fatal(err)
 		}
+		totalFeatures := 6
+		xi := make([]int, totalFeatures)
+		for i, v := range line {
+			if i < totalFeatures {
+				vi, err := strconv.Atoi(v)
+				if err != nil {
+					log.Fatal("Cannot convert str to int in csv parsing.", err)
+				}
+				xi[i] = vi
+			}
+		}
 		bs = append(bs, Ball{
-			Color: line[0],
-			Class: line[1],
+			red:    xi[0],
+			green:  xi[1],
+			blue:   xi[2],
+			yellow: xi[3],
+			white:  xi[4],
+			black:  xi[5],
+			Class:  line[6],
 		})
 	}
 	return bs

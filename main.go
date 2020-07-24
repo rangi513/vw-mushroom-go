@@ -10,51 +10,51 @@ import (
 func main() {
 	// Set Constants and seed
 	rand.Seed(time.Now().Unix())
-	const iter = 150000
+	const iter = 10000
 	// Dataset "mushroom" or "shuttle" or "ball"
 	const datasetName = "shuttle"
 	// Files
-	const scoredRecordPath = "updates/scored.dat"
-	const contextPath = "updates/context.dat"
-	const actionTakenPath = "updates/actionTaken.dat"
-	const policyPath = "updates/policy.vw"
+	const policyPath = "updates/policy"
 	const logPath = "updates/log.dat"
 	// Learning Params
 	const banditMethod = "--cb_explore"
 	const policyEvaluationApproach = "dr"
 	const explorationAlgorithm = "--cover"
-	const explorationParam = "32"
+	const explorationParam = "2"
 	// Config
 	const verbose = false
 
 	// Pull Data
 	records, totalActions := CollectData(datasetName)
+	scoredAction := ""
 	for i := 0; i <= iter-1; i++ {
 		if i%500 == 0 {
 			fmt.Println("Iteration: ", i)
 		}
+		// Define old and new policy paths for iteration
+		op, np := GetPolicyPaths(policyPath, i)
+
 		// Initialize or Update Policy
-		UpdatePolicy(scoredRecordPath, policyPath, banditMethod, totalActions, policyEvaluationApproach, explorationAlgorithm, explorationParam, false, verbose)
+		UpdatePolicy(scoredAction, op, np, banditMethod, totalActions, policyEvaluationApproach, explorationAlgorithm, explorationParam, false, verbose)
 
 		// Sample with replacement from data
 		record := records.Sample()
 		featureSet := record.Features()
-		WriteToFile(contextPath, featureSet)
 
 		// Take Action
-		action, probability := SelectAction(contextPath, policyPath, actionTakenPath, verbose)
+		action, probability := SelectAction(featureSet, np, verbose)
 		// Observe Reward
 		reward, err := record.Reward(action)
 		if err != nil {
 			log.Fatal("No reward returned ", err)
 		}
-		cost := 0.0
-		if reward != 0.0 {
-			cost = reward * -1.0
-		}
-		WriteScored(action, cost, probability, featureSet, scoredRecordPath, logPath)
+		cost := Cost(reward)
+
+		scoredAction = ScoredString(action, cost, probability, featureSet)
+		AppendToLog(logPath, scoredAction+"\n")
 	}
 
 	// Final Update with coefficient output
-	UpdatePolicy(scoredRecordPath, policyPath, banditMethod, totalActions, policyEvaluationApproach, explorationAlgorithm, explorationParam, true, verbose)
+	opp, npp := GetPolicyPaths(policyPath, iter)
+	UpdatePolicy(scoredAction, opp, npp, banditMethod, totalActions, policyEvaluationApproach, explorationAlgorithm, explorationParam, true, verbose)
 }
