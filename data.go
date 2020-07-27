@@ -12,7 +12,7 @@ type Record interface {
 }
 
 // CollectData : collects the dataset from the respective source and the number of total actions
-func CollectData(d string) (Data, string) {
+func CollectData(d string) (Data, []int) {
 	switch d {
 	case "mushroom":
 		return GetMushrooms(), GetMushroomActions()
@@ -21,5 +21,14 @@ func CollectData(d string) (Data, string) {
 	case "ball":
 		return GetBalls(), GetBallActions()
 	}
-	return nil, "0"
+	return nil, []int{}
+}
+
+// GetActionSet : Creates a slice of integers from 1 to N the total number of actions
+func GetActionSet(n int) []int {
+	a := make([]int, n)
+	for i := range a {
+		a[i] = 1 + i
+	}
+	return a
 }

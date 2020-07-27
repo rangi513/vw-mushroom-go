@@ -42,7 +42,7 @@ func (s Shuttle) Features() string {
 	reg := regexp.MustCompile(`Class.*$`)
 	st = reg.ReplaceAllString(st, "${1}")
 	st = strings.TrimSpace(st)
-	st = "|A " + st
+	st = "|F " + st
 	return st
 }
 
@@ -57,8 +57,8 @@ func (s Shuttle) Reward(action int) float64 {
 }
 
 //GetShuttleActions : Get total number of actions for the Shuttle dataset
-func GetShuttleActions() string {
-	return "7"
+func GetShuttleActions() []int {
+	return GetActionSet(7)
 }
 
 // GetShuttle : Parses the provided full csv into a Shuttles struct

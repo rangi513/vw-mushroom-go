@@ -9,22 +9,21 @@ import (
 func main() {
 	// Set Constants and seed
 	rand.Seed(time.Now().Unix())
-	const iter = 10000
+	const iter = 5000
 	// Dataset "mushroom" or "shuttle" or "ball"
-	const datasetName = "shuttle"
+	const datasetName = "ball"
 	// Files
 	const policyPath = "updates/policy"
 	const logPath = "updates/log.dat"
-	// Learning Params
-	const banditMethod = "--cb_explore"
-	const policyEvaluationApproach = "dr"
-	const explorationAlgorithm = "--cover"
-	const explorationParam = "2"
+	// Learning Params for CMAB Explore with Action Dependent Features
+	const pEval = "dr"       // Policy Evaluation Method
+	const expAlg = "--cover" // Exploration Algorithm
+	const expParam = "2"     // Exploration Parameter
 	// Config
 	const verbose = false
 
 	// Pull Data
-	records, totalActions := CollectData(datasetName)
+	records, allActions := CollectData(datasetName)
 	scoredAction := ""
 	for i := 0; i <= iter-1; i++ {
 		if i%500 == 0 {
@@ -34,24 +33,24 @@ func main() {
 		op, np := GetPolicyPaths(policyPath, i)
 
 		// Initialize or Update Policy
-		UpdatePolicy(scoredAction, op, np, banditMethod, totalActions, policyEvaluationApproach, explorationAlgorithm, explorationParam, false, verbose)
+		UpdatePolicy(scoredAction, op, np, pEval, expAlg, expParam, false, verbose)
 
 		// Sample with replacement from data
 		record := records.Sample()
 		featureSet := record.Features()
 
 		// Take Action
-		action, probability := SelectAction(featureSet, np, verbose)
+		action, probability := SelectAction(featureSet, np, allActions, verbose)
 
 		// Observe Reward
 		reward := record.Reward(action)
 		cost := Cost(reward)
 
-		scoredAction = ScoredString(action, cost, probability, featureSet)
+		scoredAction = ScoredString(action, cost, probability, featureSet, allActions)
 		AppendToLog(logPath, scoredAction+"\n")
 	}
 
 	// Final Update with coefficient output
 	opp, npp := GetPolicyPaths(policyPath, iter)
-	UpdatePolicy(scoredAction, opp, npp, banditMethod, totalActions, policyEvaluationApproach, explorationAlgorithm, explorationParam, true, verbose)
+	UpdatePolicy(scoredAction, opp, npp, pEval, expAlg, expParam, true, verbose)
 }
