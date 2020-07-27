@@ -52,10 +52,13 @@ func SelectAction(context string, policyPath string, allActions []int, verbose b
 		fmt.Println("Action Probabilities: \n", string(stdout))
 	}
 	// 1. Read Action probabilities into slice
-	actionIdx, actionProbs := getActionProbs(stdout)
+	actionIdxs, actionProbs := getActionProbs(stdout)
 	// 2. Sample From PMF
-	actionIndex, probability := sampleCustomPMF(actionIdx, actionProbs)
+	actionIndex, probability := sampleCustomPMF(actionIdxs, actionProbs)
 	// 3. Return Action and Probability
+	if verbose {
+		fmt.Println("Action Selected: ", actionIndex)
+	}
 	return actionIndex, probability
 }
 

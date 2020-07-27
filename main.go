@@ -1,39 +1,39 @@
 package main
 
 import (
-	"fmt"
 	"math/rand"
 	"time"
+
+	"github.com/cheggaaa/pb"
 )
 
 func main() {
 	// Set Constants and seed
 	rand.Seed(time.Now().Unix())
-	const iter = 5000
+	const iter = 10000
 	// Dataset "mushroom" or "shuttle" or "ball"
-	const datasetName = "ball"
+	const datasetName = "shuttle"
 	// Files
 	const policyPath = "updates/policy"
 	const logPath = "updates/log.dat"
 	// Learning Params for CMAB Explore with Action Dependent Features
-	const pEval = "dr"         // Policy Evaluation Method
-	const expAlg = "--epsilon" // Exploration Algorithm
-	const expParam = "0.2"     // Exploration Parameter
+	const pEval = "dr"            // Policy Evaluation Method
+	expAlg := []string{"--regcb"} // Exploration Algorithm
 	// Config
 	const verbose = false
 
 	// Pull Data
 	records, allActions := CollectData(datasetName)
 	scoredAction := ""
+	scoredActionLogs := ""
+	bar := pb.StartNew(iter)
 	for i := 0; i <= iter-1; i++ {
-		if i%500 == 0 {
-			fmt.Println("Iteration: ", i)
-		}
+		bar.Increment()
 		// Define old and new policy paths for iteration
 		op, np := GetPolicyPaths(policyPath, i)
 
 		// Initialize or Update Policy
-		UpdatePolicy(scoredAction, op, np, pEval, expAlg, expParam, false, verbose)
+		UpdatePolicy(scoredAction, op, np, pEval, expAlg, false, verbose)
 
 		// Sample with replacement from data
 		record := records.Sample()
@@ -47,10 +47,12 @@ func main() {
 		cost := Cost(reward)
 
 		scoredAction = ScoredString(action, cost, probability, featureSet, allActions)
-		AppendToLog(logPath, scoredAction+"\n")
+		scoredActionLogs += scoredAction + "\n"
 	}
 
 	// Final Update with coefficient output
 	opp, npp := GetPolicyPaths(policyPath, iter)
-	UpdatePolicy(scoredAction, opp, npp, pEval, expAlg, expParam, true, verbose)
+	UpdatePolicy(scoredAction, opp, npp, pEval, expAlg, true, verbose)
+	AppendToLog(logPath, scoredActionLogs)
+	bar.Finish()
 }

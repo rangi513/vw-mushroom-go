@@ -10,8 +10,7 @@ import (
 
 // UpdatePolicy : Creates a new policy or updates an existing policy based on observed data
 func UpdatePolicy(scoredAction string, oldPolicyPath string, newPolicyPath string,
-	policyEvaluationApproach string, explorationAlgorithm string,
-	explorationParam string, coefOutput bool, verbose bool) {
+	policyEvaluationApproach string, explorationAlgorithm []string, coefOutput bool, verbose bool) {
 
 	// Format Command Arguments
 	cmdArgs := []string{}
@@ -30,8 +29,8 @@ func UpdatePolicy(scoredAction string, oldPolicyPath string, newPolicyPath strin
 		cmdArgs = append(cmdArgs,
 			"--cb_explore_adf",
 			"--cb_type", policyEvaluationApproach,
-			explorationAlgorithm, explorationParam, //"--nounif",
 			"--interactions", "AF")
+		cmdArgs = append(cmdArgs, explorationAlgorithm...)
 	}
 	cmdArgs = append(cmdArgs,
 		"--save_resume",

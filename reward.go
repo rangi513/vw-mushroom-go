@@ -11,16 +11,16 @@ import (
 // ScoredString : Writes scored records action:cost:probability | features to a string
 func ScoredString(action int, cost float64, prob float64, features string, allActions []int) string {
 	s := "shared " + features + "\n"
-	actionBase := "|A selection="
 	// a := strconv.Itoa(action)
 	c := strconv.FormatFloat(cost, 'g', -1, 64)
 	p := strconv.FormatFloat(prob, 'g', -1, 64)
 	for _, v := range allActions {
 		sAction := strconv.Itoa(v)
+		actionSet := "|A selection=" + sAction + "\n"
 		if action == v {
-			s += "0" + ":" + c + ":" + p + " " + actionBase + sAction + "\n"
+			s += "0" + ":" + c + ":" + p + " " + actionSet
 		} else {
-			s += actionBase + sAction + "\n"
+			s += actionSet
 		}
 	}
 	return s
