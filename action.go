@@ -13,19 +13,21 @@ import (
 )
 
 // SelectAction : Selects action given features and policy
-func SelectAction(context string, policyPath string, verbose bool) (int, float64) {
+func SelectAction(context string, policyPath string, allActions []int, verbose bool) (int, float64) {
 	if verbose {
-		fmt.Println("Selecting Action...")
+		fmt.Println("-----------------------\nSelecting Action...")
 	}
+	// Add Actions to Context Features (Full Context)
+	fc := ScoredString(0, 0.0, 0.0, context, allActions)
+
 	// Collect Arguments
 	cmdArgs := []string{
 		"-t", // testing only saves memory
 		"-i", policyPath,
 		"-p", "/dev/stdout", // Pipe predictions to stdout instead of file
+		"--quiet", // Always need quiet because we pipe action probs to stdout
 	}
-	if !verbose {
-		cmdArgs = append(cmdArgs, "--quiet")
-	}
+
 	// Initialize Command
 	cmd := exec.Command("vw", cmdArgs...)
 	// Pipe context to stdin
@@ -35,8 +37,11 @@ func SelectAction(context string, policyPath string, verbose bool) (int, float64
 	}
 	go func() {
 		defer stdin.Close()
-		io.WriteString(stdin, context)
+		io.WriteString(stdin, fc)
 	}()
+	if verbose {
+		fmt.Println("Context Features: ", fc)
+	}
 
 	// Execute Command
 	stdout, err := cmd.CombinedOutput()
@@ -44,27 +49,39 @@ func SelectAction(context string, policyPath string, verbose bool) (int, float64
 		log.Fatal("Couldn't select action ", err)
 	}
 	if verbose {
-		fmt.Println("Action Selected: \n", string(stdout))
+		fmt.Println("Action Probabilities: \n", string(stdout))
 	}
 	// 1. Read Action probabilities into slice
-	actionProbs := getActionProbs(stdout)
+	actionIdxs, actionProbs := getActionProbs(stdout)
 	// 2. Sample From PMF
-	actionIndex, probability := sampleCustomPMF(actionProbs)
+	actionIndex, probability := sampleCustomPMF(actionIdxs, actionProbs)
 	// 3. Return Action and Probability
-	return actionIndex + 1, probability
+	if verbose {
+		fmt.Println("Action Selected: ", actionIndex)
+	}
+	return actionIndex, probability
 }
 
-func getActionProbs(actionTaken []byte) []float64 {
-	var actionProbsFloat []float64
-
-	actionProbs := strings.Fields(string(actionTaken))
-
-	for _, prob := range actionProbs {
-		if n, err := strconv.ParseFloat(prob, 64); err == nil {
-			actionProbsFloat = append(actionProbsFloat, n)
+// getActionProbs : Need to parse something like 0:0.5,2:.25,4:.25 into [0,2,4] and [0.5, 0.25, 0.25]
+func getActionProbs(actionTaken []byte) ([]int, []float64) {
+	ax := []int{}
+	px := []float64{}
+	trimmedString := strings.TrimSpace(string(actionTaken))
+	sf := strings.Split(trimmedString, ",")
+	for _, v := range sf {
+		ss := strings.Split(v, ":")
+		action, err := strconv.Atoi(ss[0])
+		if err != nil {
+			log.Fatal("Could not parse action probabilities", err)
 		}
+		prob, err := strconv.ParseFloat(ss[1], 64)
+		if err != nil {
+			log.Fatal("Could not parse action probabilities", err)
+		}
+		ax = append(ax, action+1) // +1 because index 0
+		px = append(px, prob)
 	}
-	return actionProbsFloat
+	return ax, px
 }
 
 // Converted from Python Example Here
@@ -79,7 +96,7 @@ func getActionProbs(actionTaken []byte) []float64 {
 //         sum_prob += prob
 //         if(sum_prob > draw):
 //             return index, prob
-func sampleCustomPMF(actionProbs []float64) (int, float64) {
+func sampleCustomPMF(actionIdx []int, actionProbs []float64) (int, float64) {
 	total := floats.Sum(actionProbs)
 	scale := 1 / total
 	var scaledActionProbs []float64
@@ -88,10 +105,10 @@ func sampleCustomPMF(actionProbs []float64) (int, float64) {
 	}
 	draw := rand.Float64()
 	sumProb := 0.0
-	for index, prob := range scaledActionProbs {
+	for i, prob := range scaledActionProbs {
 		sumProb += prob
 		if sumProb > draw {
-			return index, prob
+			return actionIdx[i], prob
 		}
 	}
 	return len(scaledActionProbs) - 1, 1.0

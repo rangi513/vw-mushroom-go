@@ -40,7 +40,7 @@ func (b Ball) Features() string {
 	st = reg.ReplaceAllString(st, "${1}")
 	st = strings.TrimSpace(st)
 	// st = strings.ReplaceAll(st, ":", "=")
-	st = "| " + st
+	st = "|F " + st
 	return st
 }
 
@@ -71,8 +71,8 @@ func (b Ball) Reward(action int) float64 {
 }
 
 // GetBallActions : Get the total number of actions for the Mushroom Dataset
-func GetBallActions() string {
-	return "6"
+func GetBallActions() []int {
+	return GetActionSet(6)
 }
 
 // GetBalls : Parses the provided full csv into a Balls struct

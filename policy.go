@@ -9,17 +9,12 @@ import (
 )
 
 // UpdatePolicy : Creates a new policy or updates an existing policy based on observed data
-func UpdatePolicy(scoredAction string, oldPolicyPath string, newPolicyPath string, banditMethod string,
-	totalActions string, policyEvaluationApproach string, explorationAlgorithm string,
-	explorationParam string, coefOutput bool, verbose bool) {
+func UpdatePolicy(scoredAction string, oldPolicyPath string, newPolicyPath string,
+	policyEvaluationApproach string, explorationAlgorithm []string, coefOutput bool, verbose bool) {
 
-	// Format Arguments
-	cmdArgs := []string{
-		banditMethod, totalActions,
-		"--cb_type", policyEvaluationApproach,
-		explorationAlgorithm, explorationParam, // "--nounif",
-		// "--interactions", "AA",
-	}
+	// Format Command Arguments
+	cmdArgs := []string{}
+
 	if FileExists(oldPolicyPath) {
 		// If policy exists, update existing policy
 		if verbose {
@@ -31,6 +26,11 @@ func UpdatePolicy(scoredAction string, oldPolicyPath string, newPolicyPath strin
 		if verbose {
 			fmt.Println("Creating initial policy...")
 		}
+		cmdArgs = append(cmdArgs,
+			"--cb_explore_adf",
+			"--cb_type", policyEvaluationApproach,
+			"--interactions", "AF")
+		cmdArgs = append(cmdArgs, explorationAlgorithm...)
 	}
 	cmdArgs = append(cmdArgs,
 		"--save_resume",
@@ -44,14 +44,19 @@ func UpdatePolicy(scoredAction string, oldPolicyPath string, newPolicyPath strin
 	cmd := exec.Command("vw", cmdArgs...)
 
 	// Write Data in Stdin
-	stdin, err := cmd.StdinPipe()
-	if err != nil {
-		log.Fatal(err)
+	if scoredAction != "" {
+		if verbose {
+			fmt.Println("Record passed to update: ", scoredAction)
+		}
+		stdin, err := cmd.StdinPipe()
+		if err != nil {
+			log.Fatal(err)
+		}
+		go func() {
+			defer stdin.Close()
+			io.WriteString(stdin, scoredAction)
+		}()
 	}
-	go func() {
-		defer stdin.Close()
-		io.WriteString(stdin, scoredAction)
-	}()
 
 	// Execute command
 	out, err := cmd.CombinedOutput()

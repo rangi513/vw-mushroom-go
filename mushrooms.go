@@ -54,7 +54,7 @@ func (m Mushroom) Features() string {
 	s = TrimLeftChar(s)
 	s = strings.TrimSpace(s)
 	s = strings.ReplaceAll(s, ":", "=")
-	s = "| " + s
+	s = "|F " + s
 	return s
 }
 
@@ -80,8 +80,8 @@ func (m Mushroom) Reward(action int) float64 {
 }
 
 // GetMushroomActions : Get the total number of actions for the Mushroom Dataset
-func GetMushroomActions() string {
-	return "2"
+func GetMushroomActions() []int {
+	return GetActionSet(2)
 }
 
 // GetMushrooms : Parses the provided full csv into a Mushrooms struct
