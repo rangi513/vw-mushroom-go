@@ -14,11 +14,8 @@ func UpdatePolicy(scoredAction string, oldPolicyPath string, newPolicyPath strin
 	explorationParam string, coefOutput bool, verbose bool) {
 
 	// Format Command Arguments
-	cmdArgs := []string{
-		"--cb_explore_adf",
-		"--cb_type", policyEvaluationApproach,
-		explorationAlgorithm, explorationParam, //"--nounif",
-	}
+	cmdArgs := []string{}
+
 	if FileExists(oldPolicyPath) {
 		// If policy exists, update existing policy
 		if verbose {
@@ -30,7 +27,11 @@ func UpdatePolicy(scoredAction string, oldPolicyPath string, newPolicyPath strin
 		if verbose {
 			fmt.Println("Creating initial policy...")
 		}
-		cmdArgs = append(cmdArgs, "-q", "AF")
+		cmdArgs = append(cmdArgs,
+			"--cb_explore_adf",
+			"--cb_type", policyEvaluationApproach,
+			explorationAlgorithm, explorationParam, //"--nounif",
+			"--interactions", "AF")
 	}
 	cmdArgs = append(cmdArgs,
 		"--save_resume",
@@ -45,6 +46,9 @@ func UpdatePolicy(scoredAction string, oldPolicyPath string, newPolicyPath strin
 
 	// Write Data in Stdin
 	if scoredAction != "" {
+		if verbose {
+			fmt.Println("Record passed to update: ", scoredAction)
+		}
 		stdin, err := cmd.StdinPipe()
 		if err != nil {
 			log.Fatal(err)

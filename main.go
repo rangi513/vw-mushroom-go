@@ -16,9 +16,9 @@ func main() {
 	const policyPath = "updates/policy"
 	const logPath = "updates/log.dat"
 	// Learning Params for CMAB Explore with Action Dependent Features
-	const pEval = "dr"       // Policy Evaluation Method
-	const expAlg = "--cover" // Exploration Algorithm
-	const expParam = "2"     // Exploration Parameter
+	const pEval = "dr"         // Policy Evaluation Method
+	const expAlg = "--epsilon" // Exploration Algorithm
+	const expParam = "0.2"     // Exploration Parameter
 	// Config
 	const verbose = false
 
