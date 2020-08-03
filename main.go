@@ -61,10 +61,10 @@ func main() {
 			// Pull Data
 			records, allActions := CollectData(datasetName)
 			for _, expAlg := range expAlgSlice {
-				gridName := datasetName + strings.Join(expAlg, "-") + "+" + strconv.Itoa(j)
+				gridName := datasetName + "-" + strings.Join(expAlg, "-") + "+" + strconv.Itoa(j)
 				logPath := baseLogPath + gridName + ".dat"
 				policyPath := policyPathBase + gridName
-				regretPath := baseRegretLogPath + gridName
+				regretPath := baseRegretLogPath + gridName + ".txt"
 				fmt.Println("Beginning: " + gridName)
 
 				// Initalize Variables
