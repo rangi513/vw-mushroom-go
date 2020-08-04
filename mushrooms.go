@@ -59,24 +59,31 @@ func (m Mushroom) Features() string {
 }
 
 // Reward : reward +5 for edible and +5, -35 with equal probability for poisonous.
-// 0 reward if you don't eat
-func (m Mushroom) Reward(action int) float64 {
+// 0 reward if you don't eat. Regret is the second item in the return set
+func (m Mushroom) Reward(action int) (reward float64, regret float64) {
 	class := m.Class
-	reward := 0.0
-	if action == 2 && class == "e" {
-		reward = 5
-	} else if action == 2 && class == "p" {
-		if rand.Float64() >= 0.5 {
-			reward = -35
+	if action == 2 {
+		// Action Eat
+		if class == "e" {
+			// If edible reward = 5 regret = 0
+			reward = 5.0
 		} else {
-			reward = 5
+			// If poisonous
+			regret = (35 - 5) / 2.0
+			if rand.Float64() >= 0.5 {
+				reward = -35.0
+			} else {
+				reward = 5.0
+			}
 		}
-	} else if action == 1 {
-		reward = 0.0
 	} else {
-		log.Fatal("Error: Invalid Action selected")
+		// Action Don't Eat
+		if class == "e" {
+			// If edible reget = 5, if poisonous regret = 0
+			regret = 5.0
+		}
 	}
-	return reward
+	return reward, regret
 }
 
 // GetMushroomActions : Get the total number of actions for the Mushroom Dataset

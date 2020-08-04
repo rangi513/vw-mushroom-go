@@ -48,12 +48,15 @@ func (s Shuttle) Features() string {
 
 // Reward : . There are k = 7 possible states, and if the agent selects the right
 // state, then reward 1 is generated. Otherwise, the agent obtains no reward (r = 0).
-func (s Shuttle) Reward(action int) float64 {
+func (s Shuttle) Reward(action int) (reward float64, regret float64) {
 	r := 0.0
 	if action == s.Class {
 		r = 1.0
 	}
-	return r
+	if r == 0.0 {
+		regret = 1.0
+	}
+	return r, regret
 }
 
 //GetShuttleActions : Get total number of actions for the Shuttle dataset
